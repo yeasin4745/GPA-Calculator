@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPA Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #90e0ef 0%, #caf0f8 100%);
+            min-height: 100vh;
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 480px;
+            background: #fff;
+            margin: 40px auto 0 auto;
+            padding: 32px 32px 24px 32px;
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(44, 62, 80, 0.18);
+        }
+        h1 {
+            text-align: center;
+            color: #1b4965;
+            margin-bottom: 16px;
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+        label {
+            font-weight: 500;
+            color: #22334d;
+            margin-bottom: 6px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #90e0ef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        input[type="number"]:focus {
+            border-color: #00b4d8;
+            outline: none;
+        }
+        button {
+            margin-top: 16px;
+            padding: 10px 0;
+            background: linear-gradient(90deg, #48cae4, #00b4d8);
+            color: #fff;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-weight: 700;
+            letter-spacing: 1.1px;
+        }
+        button:hover {
+            background: linear-gradient(90deg, #00b4d8, #48cae4);
+        }
+        .results {
+            margin-top: 24px;
+        }
+        .results table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            background: #f1f9fb;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .results th, .results td {
+            padding: 10px 8px;
+            text-align: center;
+        }
+        .results th {
+            background: #bde0fe;
+            color: #1b4965;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        .results td {
+            font-size: 0.97rem;
+            color: #264653;
+        }
+        .gpa-total {
+            margin-top: 18px;
+            padding: 10px;
+            background: #b5ead7;
+            color: #184d47;
+            border-radius: 8px;
+            font-size: 1.12rem;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+        .error {
+            color: #e63946;
+            background: #ffe0e6;
+            padding: 8px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            font-size: 0.97rem;
+            text-align: center;
+        }
+        @media (max-width: 550px) {
+            .container {
+                padding: 14px 5px 18px 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GPA Calculator</h1>
+        <form id="gpaForm" autocomplete="off">
+            <div>
+                <label for="bangla">Bangla Marks</label>
+                <input type="number" id="bangla" name="bangla" min="0" max="100" placeholder="0-100" required>
+            </div>
+            <div>
+                <label for="english">English Marks</label>
+                <input type="number" id="english" name="english" min="0" max="100" placeholder="0-100" required>
+            </div>
+            <div>
+                <label for="math">Math Marks</label>
+                <input type="number" id="math" name="math" min="0" max="100" placeholder="0-100" required>
+            </div>
+            <div>
+                <label for="physics">Physics Marks</label>
+                <input type="number" id="physics" name="physics" min="0" max="100" placeholder="0-100" required>
+            </div>
+            <div>
+                <label for="chemistry">Chemistry Marks</label>
+                <input type="number" id="chemistry" name="chemistry" min="0" max="100" placeholder="0-100" required>
+            </div>
+            <div>
+                <label for="biology">Biology Marks</label>
+                <input type="number" id="biology" name="biology" min="0" max="100" placeholder="0-100" required>
+            </div>
+            <button type="submit">Calculate</button>
+        </form>
+        <div id="errorMsg" class="error" style="display:none;"></div>
+        <div class="results" id="results" style="display:none;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Marks</th>
+                        <th>Grade</th>
+                        <th>GPA</th>
+                    </tr>
+                </thead>
+                <tbody id="resultRows"></tbody>
+            </table>
+            <div class="gpa-total" id="gpaTotal"></div>
+        </div>
+    </div>
+    <script>
+        function getGPAandGrade(mark) {
+            if (mark >= 0 && mark <= 32) return { gpa: 0, grade: "F" };
+            if (mark >= 33 && mark <= 39) return { gpa: 1, grade: "D" };
+            if (mark >= 40 && mark <= 49) return { gpa: 2, grade: "C" };
+            if (mark >= 50 && mark <= 59) return { gpa: 3, grade: "B" };
+            if (mark >= 60 && mark <= 69) return { gpa: 3.5, grade: "A-" };
+            if (mark >= 70 && mark <= 79) return { gpa: 4, grade: "A" };
+            if (mark >= 80 && mark <= 100) return { gpa: 5, grade: "A+" };
+            return { gpa: null, grade: "Invalid" };
+        }
+
+        const subjects = [
+            { name: "Bangla", id: "bangla" },
+            { name: "English", id: "english" },
+            { name: "Math", id: "math" },
+            { name: "Physics", id: "physics" },
+            { name: "Chemistry", id: "chemistry" },
+            { name: "Biology", id: "biology" }
+        ];
+
+        document.getElementById('gpaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            let marks = [];
+            let errorMsg = "";
+            let failed = false;
+
+            // Gather and validate marks
+            for (let subject of subjects) {
+                let input = document.getElementById(subject.id);
+                let value = input.value.trim();
+                if (value === "") {
+                    errorMsg = "Please fill in all subjects.";
+                    break;
+                }
+                let num = Number(value);
+                if (isNaN(num) || num < 0 || num > 100) {
+                    errorMsg = `Please enter a valid number (0-100) for ${subject.name}.`;
+                    break;
+                }
+                marks.push(num);
+            }
+
+            if (errorMsg) {
+                document.getElementById('errorMsg').innerText = errorMsg;
+                document.getElementById('errorMsg').style.display = 'block';
+                document.getElementById('results').style.display = 'none';
+                return;
+            } else {
+                document.getElementById('errorMsg').style.display = 'none';
+            }
+
+            let totalGPA = 0;
+            let hasFail = false;
+            let tbodyHtml = "";
+
+            for (let i = 0; i < subjects.length; i++) {
+                const { gpa, grade } = getGPAandGrade(marks[i]);
+                if (gpa === 0) hasFail = true;
+                totalGPA += gpa;
+                tbodyHtml += `<tr>
+                    <td>${subjects[i].name}</td>
+                    <td>${marks[i]}</td>
+                    <td>${grade}</td>
+                    <td>${gpa}</td>
+                </tr>`;
+            }
+
+            // If any fail, GPA is 0
+            let avgGPA = hasFail ? 0 : (totalGPA / subjects.length);
+            let gpaText = hasFail
+                ? "You have failed in one or more subjects. Total GPA: <span style='color:#e63946;'>0.00</span>"
+                : `Your Total GPA: <span style='color:#1b7e36;'>${avgGPA.toFixed(2)}</span>`;
+
+            document.getElementById('resultRows').innerHTML = tbodyHtml;
+            document.getElementById('gpaTotal').innerHTML = gpaText;
+            document.getElementById('results').style.display = 'block';
+        });
+    </script>
+</body>
+</html>
